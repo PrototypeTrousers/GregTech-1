@@ -271,7 +271,7 @@ public class SecondDegreeMaterials {
         VanadiumSteel = new Material.Builder(2036, "vanadium_steel")
                 .ingot(3).fluid()
                 .color(0xc0c0c0).iconSet(METALLIC)
-                .flags(EXT2_METAL, GENERATE_FOIL)
+                .flags(EXT2_METAL, GENERATE_FOIL, GENERATE_GEAR )
                 .components(Vanadium, 1, Chrome, 1, Steel, 7)
                 .toolStats(7.0f, 3.0f, 1920, 21)
                 .fluidPipeProperties(2073, 100, true)
