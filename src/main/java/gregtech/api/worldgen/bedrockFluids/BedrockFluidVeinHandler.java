@@ -79,14 +79,29 @@ public class BedrockFluidVeinHandler {
     }
 
     /**
-     * Gets the current production rate of fluid in a specific chunk's vein
+     * gets the amount of fluid to be produced in a specific chunk
+     *
+     * @param world the world to retrieve it from
+     * @param chunkX X coordinate of desired chunk
+     * @param chunkZ Z coordinate of desired chunk
+     * @return amount of fluid to produce from the vein
+     */
+    public static int getFluidProductionInChunk(World world, int chunkX, int chunkZ) {
+        FluidVeinWorldEntry info = getFluidVeinWorldEntry(world, chunkX, chunkZ);
+        if (info == null)
+            return 0;
+        return info.maximumCapacity;
+    }
+
+    /**
+     * Gets the current amount of fluid in a specific chunk's vein
      *
      * @param world  The world to test
      * @param chunkX X coordinate of desired chunk
      * @param chunkZ Z coordinate of desired chunk
-     * @return rate of fluid in the given vein
+     * @return amount of fluid in the given vein
      */
-    public static int getFluidRateInChunk(World world, int chunkX, int chunkZ) {
+    public static int getFluidAmountInChunk(World world, int chunkX, int chunkZ) {
         FluidVeinWorldEntry info = getFluidVeinWorldEntry(world, chunkX, chunkZ);
         if (info == null)
             return 0;
@@ -123,7 +138,7 @@ public class BedrockFluidVeinHandler {
      * @param chunkZ Z coordinate of desired chunk
      * @return rate of fluid produced post depletion
      */
-    public static int getDepletedFluidRate(World world, int chunkX, int chunkZ) {
+    public static int getDepletedFluidProduction(World world, int chunkX, int chunkZ) {
         FluidVeinWorldEntry info = getFluidVeinWorldEntry(world, chunkX, chunkZ);
         if (info == null)
             return 0;
