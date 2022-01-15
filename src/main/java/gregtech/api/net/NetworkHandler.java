@@ -36,7 +36,7 @@ public class NetworkHandler {
         registerPacket(CPacketPluginSynced.class);
         registerPacket(CPacketRecoverMTE.class);
         registerPacket(CPacketKeysPressed.class);
-        registerPacket(SPacketFluidVeinList.class);
+        registerPacket(CPacketFluidVeinList.class);
 
         initServer();
         if (FMLCommonHandler.instance().getSide().isClient()) {
@@ -51,6 +51,7 @@ public class NetworkHandler {
         registerServerExecutor(CPacketPluginSynced.class);
         registerServerExecutor(CPacketRecoverMTE.class);
         registerServerExecutor(CPacketKeysPressed.class);
+        registerServerExecutor(CPacketFluidVeinList.class);
     }
 
     // Register packets as "received on client" here
@@ -60,7 +61,6 @@ public class NetworkHandler {
         registerClientExecutor(SPacketUIWidgetUpdate.class);
         registerClientExecutor(SPacketBlockParticle.class);
         registerClientExecutor(SPacketClipboard.class);
-        registerClientExecutor(SPacketFluidVeinList.class);
     }
 
 
