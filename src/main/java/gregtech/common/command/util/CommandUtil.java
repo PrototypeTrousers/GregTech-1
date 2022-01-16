@@ -9,6 +9,7 @@ public class CommandUtil extends CommandTreeBase {
 
     public CommandUtil() {
         addSubcommand(new CommandHand());
+        addSubcommand(new CommandRecipeCheck());
     }
 
     @Nonnull
