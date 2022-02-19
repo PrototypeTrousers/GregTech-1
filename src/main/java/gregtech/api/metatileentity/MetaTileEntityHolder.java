@@ -9,7 +9,6 @@ import gregtech.api.net.NetworkHandler;
 import gregtech.api.net.packets.CPacketRecoverMTE;
 import gregtech.api.util.GTLog;
 import gregtech.api.util.GTUtility;
-import gregtech.api.util.TaskScheduler;
 import gregtech.client.particle.GTNameTagParticle;
 import gregtech.client.particle.GTParticleManager;
 import net.minecraft.block.state.IBlockState;
@@ -22,11 +21,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.Style;
-import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.*;
 import net.minecraft.world.IWorldNameable;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
@@ -98,7 +93,7 @@ public class MetaTileEntityHolder extends TickableTileEntityBase implements IUIH
     }
 
     public void notifyBlockUpdate() {
-        getWorld().notifyNeighborsOfStateChange(pos, getBlockType(), false);
+        getWorld().notifyNeighborsOfStateChange(pos, getBlockType(), true);
     }
 
     @Override

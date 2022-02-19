@@ -13,14 +13,13 @@ import net.minecraft.world.World;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ItemPipeNet extends PipeNet<ItemPipeProperties> {
 
     private final Map<BlockPos, List<Inventory>> NET_DATA = new HashMap<>();
+
+    private final EnumMap<EnumFacing, Boolean> neighbors = new EnumMap<>(EnumFacing.class);
 
     public ItemPipeNet(WorldPipeNet<ItemPipeProperties, ? extends PipeNet<ItemPipeProperties>> world) {
         super(world);
@@ -28,7 +27,7 @@ public class ItemPipeNet extends PipeNet<ItemPipeProperties> {
 
     public List<Inventory> getNetData(BlockPos pipePos, EnumFacing facing) {
         List<Inventory> data = NET_DATA.get(pipePos);
-        if (data == null) {
+        if (data == null || data.isEmpty()) {
             data = ItemNetWalker.createNetData(getWorldData(), pipePos, facing);
             data.sort(Comparator.comparingInt(inv -> inv.properties.getPriority()));
             NET_DATA.put(pipePos, data);
@@ -37,8 +36,43 @@ public class ItemPipeNet extends PipeNet<ItemPipeProperties> {
     }
 
     @Override
-    public void onNeighbourUpdate(BlockPos fromPos) {
-        NET_DATA.clear();
+    public void onNeighbourUpdate(World w, BlockPos pos, BlockPos neighbor) {
+        EnumFacing facing = null;
+        if (pos.getX() != neighbor.getX()) {
+            if (pos.getX() < neighbor.getX()) {
+                facing = EnumFacing.WEST;
+            } else {
+                facing = EnumFacing.EAST;
+            }
+        } else if (pos.getY() != neighbor.getY()) {
+            if (pos.getY() < neighbor.getY()) {
+                facing = EnumFacing.DOWN;
+            } else {
+                facing = EnumFacing.UP;
+            }
+        } else if (pos.getZ() != neighbor.getZ()) {
+            if (pos.getZ() < neighbor.getZ()) {
+                facing = EnumFacing.NORTH;
+            } else {
+                facing = EnumFacing.SOUTH;
+            }
+        }
+        List<Inventory> data = new ArrayList<>(getNetData(pos, facing));
+        for (Inventory inventory : data) {
+            if (pos.offset(facing.getOpposite()).equals(neighbor)) {
+                inventory.cached = null;
+                boolean hasNeighbor = w.getTileEntity(neighbor) == null;
+                neighbors.putIfAbsent(facing, !hasNeighbor);
+                if (neighbors.get(facing) != hasNeighbor) {
+                    if (!hasNeighbor) {
+                        NET_DATA.get(pos).remove(inventory);
+                    } else {
+                        NET_DATA.get(pos).add(inventory);
+                    }
+                    neighbors.put(facing, hasNeighbor);
+                }
+            }
+        }
     }
 
     @Override
@@ -70,6 +104,7 @@ public class ItemPipeNet extends PipeNet<ItemPipeProperties> {
         private final EnumFacing faceToHandler;
         private final int distance;
         private final ItemPipeProperties properties;
+        private IItemHandler cached;
 
         public Inventory(BlockPos pipePos, EnumFacing facing, int distance, ItemPipeProperties properties) {
             this.pipePos = pipePos;
@@ -99,9 +134,12 @@ public class ItemPipeNet extends PipeNet<ItemPipeProperties> {
         }
 
         public IItemHandler getHandler(World world) {
+            if (cached != null) return cached;
             TileEntity tile = world.getTileEntity(getHandlerPos());
-            if (tile != null)
-                return tile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, faceToHandler.getOpposite());
+            if (tile != null) {
+                cached = tile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, faceToHandler.getOpposite());
+                return cached;
+            }
             return null;
         }
 

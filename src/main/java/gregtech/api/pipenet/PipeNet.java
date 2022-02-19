@@ -60,7 +60,7 @@ public abstract class PipeNet<NodeDataType> implements INBTSerializable<NBTTagCo
     protected void onPipeConnectionsUpdate() {
     }
 
-    public void onNeighbourUpdate(BlockPos fromPos) {
+    public void onNeighbourUpdate(World w, BlockPos pos, BlockPos neighbor) {
     }
 
     public Map<BlockPos, Node<NodeDataType>> getAllNodes() {

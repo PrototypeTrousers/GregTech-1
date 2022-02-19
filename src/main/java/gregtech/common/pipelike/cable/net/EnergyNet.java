@@ -5,13 +5,11 @@ import gregtech.api.pipenet.PipeNet;
 import gregtech.api.pipenet.WorldPipeNet;
 import gregtech.api.unification.material.properties.WireProperties;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class EnergyNet extends PipeNet<WireProperties> {
 
@@ -21,13 +19,15 @@ public class EnergyNet extends PipeNet<WireProperties> {
 
     private final Map<BlockPos, List<RoutePath>> NET_DATA = new HashMap<>();
 
+    private final EnumMap<EnumFacing, Boolean> neighbors = new EnumMap<>(EnumFacing.class);
+
     protected EnergyNet(WorldPipeNet<WireProperties, EnergyNet> world) {
         super(world);
     }
 
     public List<RoutePath> getNetData(BlockPos pipePos) {
         List<RoutePath> data = NET_DATA.get(pipePos);
-        if (data == null) {
+        if (data == null || data.isEmpty()) {
             data = EnergyNetWalker.createNetData(getWorldData(), pipePos);
             data.sort(Comparator.comparingInt(RoutePath::getDistance));
             NET_DATA.put(pipePos, data);
@@ -35,8 +35,24 @@ public class EnergyNet extends PipeNet<WireProperties> {
         return data;
     }
 
-    public void onNeighbourStateChanged() {
-        NET_DATA.clear();
+    public void onNeighbourStateChanged(World w, BlockPos pos, BlockPos neighbor) {
+        List<RoutePath> data = new ArrayList<>(getNetData(pos));
+        for (RoutePath routePath : data) {
+            EnumFacing facing = routePath.getFaceToHandler();
+            if (pos.offset(facing.getOpposite()).equals(neighbor)) {
+                routePath.cached = null;
+                boolean hasNeighbor = w.getTileEntity(neighbor) == null;
+                neighbors.putIfAbsent(facing, !hasNeighbor);
+                if (neighbors.get(facing) != hasNeighbor) {
+                    if (!hasNeighbor) {
+                        NET_DATA.get(pos).remove(routePath);
+                    } else {
+                        NET_DATA.get(pos).add(routePath);
+                    }
+                    neighbors.put(facing, hasNeighbor);
+                }
+            }
+        }
     }
 
     public long getEnergyFluxPerSec() {

@@ -118,7 +118,7 @@ public class BlockCable extends BlockMaterialPipe<Insulation, WireProperties, Wo
         super.observedNeighborChange(observerState, world, observerPos, changedBlock, changedBlockPos);
         EnergyNet pipeNet = getWorldPipeNet(world).getNetFromPos(observerPos);
         if (pipeNet != null) {
-            pipeNet.onNeighbourStateChanged();
+            pipeNet.onNeighbourStateChanged(world, observerPos, changedBlockPos);
         }
     }
 

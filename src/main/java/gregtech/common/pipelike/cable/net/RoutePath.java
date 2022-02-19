@@ -16,6 +16,7 @@ public class RoutePath {
     private final int distance;
     private final Set<TileEntityCable> path;
     private final long maxLoss;
+    protected IEnergyContainer cached;
 
     public RoutePath(BlockPos destPipePos, EnumFacing destFacing, Set<TileEntityCable> path, int distance, long maxLoss) {
         this.destPipePos = destPipePos;
@@ -50,9 +51,11 @@ public class RoutePath {
     }
 
     public IEnergyContainer getHandler(World world) {
+        if (cached != null) return cached;
         TileEntity tile = world.getTileEntity(getHandlerPos());
-        if(tile != null) {
-            return tile.getCapability(GregtechCapabilities.CAPABILITY_ENERGY_CONTAINER, destFacing.getOpposite());
+        if (tile != null) {
+            cached = tile.getCapability(GregtechCapabilities.CAPABILITY_ENERGY_CONTAINER, destFacing.getOpposite());
+            return cached;
         }
         return null;
     }

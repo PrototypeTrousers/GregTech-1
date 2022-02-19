@@ -22,6 +22,7 @@ import gregtech.api.pipenet.tile.IPipeTile;
 import gregtech.api.pipenet.tile.TileEntityPipeBase;
 import gregtech.api.util.GTUtility;
 import gregtech.common.ConfigHolder;
+import gregtech.common.pipelike.cable.net.EnergyNet;
 import gregtech.common.tools.DamageValues;
 import gregtech.integration.ctm.IFacadeWrapper;
 import net.minecraft.block.Block;
@@ -173,7 +174,7 @@ public abstract class BlockPipe<PipeType extends Enum<PipeType> & IPipeType<Node
     }
 
     @Override
-    public void neighborChanged(@Nonnull IBlockState state, @Nonnull World worldIn, @Nonnull BlockPos pos, @Nonnull Block blockIn, @Nonnull BlockPos fromPos) {
+    public void observedNeighborChange(@Nonnull IBlockState state, @Nonnull World worldIn, @Nonnull BlockPos pos, @Nonnull Block blockIn, @Nonnull BlockPos fromPos) {
         if (worldIn.isRemote) return;
         if (!ConfigHolder.machines.gt6StylePipesCables) {
             IPipeTile<PipeType, NodeDataType> pipeTile = getPipeTileEntity(worldIn, pos);
@@ -198,7 +199,7 @@ public abstract class BlockPipe<PipeType extends Enum<PipeType> & IPipeType<Node
         }
         PipeNet<NodeDataType> net = getWorldPipeNet(worldIn).getNetFromPos(pos);
         if (net != null) {
-            net.onNeighbourUpdate(fromPos);
+            net.onNeighbourUpdate(worldIn, pos, fromPos);
         }
     }
 
