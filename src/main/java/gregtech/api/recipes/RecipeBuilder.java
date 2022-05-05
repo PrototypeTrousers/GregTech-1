@@ -5,6 +5,8 @@ import gregtech.api.GTValues;
 import gregtech.api.items.metaitem.MetaItem;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.recipes.Recipe.ChanceEntry;
+import gregtech.api.recipes.ingredients.NBTMatching.NBTMatcher;
+import gregtech.api.recipes.ingredients.NBTMatching.NBTcondition;
 import gregtech.api.recipes.recipeproperties.RecipeProperty;
 import gregtech.api.unification.OreDictUnifier;
 import gregtech.api.unification.material.Material;
@@ -178,7 +180,7 @@ public class RecipeBuilder<R extends RecipeBuilder<R>> {
         return input(item, 1);
     }
 
-    public R input(MetaItem<?>.MetaValueItem item, CountableIngredient.NBTMatcher nbtMatcher, CountableIngredient.NBTcondition nbtCondition) {
+    public R input(MetaItem<?>.MetaValueItem item, NBTMatcher nbtMatcher, NBTcondition nbtCondition) {
         return inputs(CountableIngredient.from(item.getStackForm()).setNBTMatchingCondition(nbtCondition, nbtMatcher));
     }
 
