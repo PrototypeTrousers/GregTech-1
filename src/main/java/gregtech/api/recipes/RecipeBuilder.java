@@ -19,7 +19,6 @@ import gregtech.api.util.ValidationResult;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
@@ -39,11 +38,11 @@ public class RecipeBuilder<R extends RecipeBuilder<R>> {
 
     protected RecipeMap<R> recipeMap;
 
-    protected final List<IGTRecipeInput> inputs;
+    protected final List<GTRecipeInput> inputs;
     protected final List<ItemStack> outputs;
     protected final List<ChanceEntry> chancedOutputs;
 
-    protected final List<IGTRecipeInput> fluidInputs;
+    protected final List<GTRecipeInput> fluidInputs;
     protected final List<FluidStack> fluidOutputs;
 
     protected int duration, EUt;
@@ -192,9 +191,9 @@ public class RecipeBuilder<R extends RecipeBuilder<R>> {
         return inputs(mte.getStackForm(amount));
     }
 
-    public R inputs(IGTRecipeInput... inputs) {
-        List<IGTRecipeInput> ingredients = new ArrayList<>();
-        for (IGTRecipeInput input : inputs) {
+    public R inputs(GTRecipeInput... inputs) {
+        List<GTRecipeInput> ingredients = new ArrayList<>();
+        for (GTRecipeInput input : inputs) {
             if (input.getAmount() < 0) {
                 GTLog.logger.error("Count cannot be less than 0. Actual: {}.", input.getAmount());
                 GTLog.logger.error("Stacktrace:", new IllegalArgumentException());
@@ -205,7 +204,7 @@ public class RecipeBuilder<R extends RecipeBuilder<R>> {
         return inputsIngredients(ingredients);
     }
 
-    public R inputsIngredients(Collection<IGTRecipeInput> ingredients) {
+    public R inputsIngredients(Collection<GTRecipeInput> ingredients) {
         this.inputs.addAll(ingredients);
         return (R) this;
     }
@@ -215,7 +214,7 @@ public class RecipeBuilder<R extends RecipeBuilder<R>> {
         return (R) this;
     }
 
-    public R notConsumable(IGTRecipeInput gtRecipeIngredient) {
+    public R notConsumable(GTRecipeInput gtRecipeIngredient) {
         return inputs(GTRecipeItemInput.getOrCreate(gtRecipeIngredient)
                 .setNonConsumable());
     }
@@ -311,18 +310,18 @@ public class RecipeBuilder<R extends RecipeBuilder<R>> {
         return (R) this;
     }
 
-    public R fluidInputs(Collection<IGTRecipeInput> fluidIngredients) {
+    public R fluidInputs(Collection<GTRecipeInput> fluidIngredients) {
         this.fluidInputs.addAll(fluidIngredients);
         return (R) this;
     }
 
-    public R fluidInputs(IGTRecipeInput fluidIngredient) {
+    public R fluidInputs(GTRecipeInput fluidIngredient) {
         this.fluidInputs.add(fluidIngredient);
         return (R) this;
     }
 
     public R fluidInputs(FluidStack... fluidStacks) {
-        ArrayList<IGTRecipeInput> fluidIngredients = new ArrayList<>();
+        ArrayList<GTRecipeInput> fluidIngredients = new ArrayList<>();
         for (FluidStack fluidStack : fluidStacks) {
             if (fluidStack != null && fluidStack.amount > 0) {
                 fluidIngredients.add(GTRecipeFluidInput.getOrCreate(fluidStack, fluidStack.amount));
@@ -436,8 +435,8 @@ public class RecipeBuilder<R extends RecipeBuilder<R>> {
         }
 
         // Create holders for the various parts of the new multiplied Recipe
-        List<IGTRecipeInput> newRecipeInputs = new ArrayList<>();
-        List<IGTRecipeInput> newFluidInputs = new ArrayList<>();
+        List<GTRecipeInput> newRecipeInputs = new ArrayList<>();
+        List<GTRecipeInput> newFluidInputs = new ArrayList<>();
         List<ItemStack> outputItems = new ArrayList<>();
         List<FluidStack> outputFluids = new ArrayList<>();
 
@@ -460,8 +459,8 @@ public class RecipeBuilder<R extends RecipeBuilder<R>> {
         return (R) this;
     }
 
-    protected static void multiplyInputsAndOutputs(List<IGTRecipeInput> newRecipeInputs,
-                                                   List<IGTRecipeInput> newFluidInputs,
+    protected static void multiplyInputsAndOutputs(List<GTRecipeInput> newRecipeInputs,
+                                                   List<GTRecipeInput> newFluidInputs,
                                                    List<ItemStack> outputItems,
                                                    List<FluidStack> outputFluids,
                                                    Recipe recipe,
@@ -590,7 +589,7 @@ public class RecipeBuilder<R extends RecipeBuilder<R>> {
     //    Getters    //
     ///////////////////
 
-    public List<IGTRecipeInput> getInputs() {
+    public List<GTRecipeInput> getInputs() {
         return inputs;
     }
 
@@ -615,7 +614,7 @@ public class RecipeBuilder<R extends RecipeBuilder<R>> {
         return stacks;
     }
 
-    public List<IGTRecipeInput> getFluidInputs() {
+    public List<GTRecipeInput> getFluidInputs() {
         return fluidInputs;
     }
 
