@@ -5,7 +5,10 @@ import gregtech.api.GTValues;
 import gregtech.api.items.metaitem.MetaItem;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.recipes.Recipe.ChanceEntry;
-import gregtech.api.recipes.ingredients.*;
+import gregtech.api.recipes.ingredients.GTRecipeFluidInput;
+import gregtech.api.recipes.ingredients.GTRecipeInput;
+import gregtech.api.recipes.ingredients.GTRecipeItemInput;
+import gregtech.api.recipes.ingredients.GTRecipeOreInput;
 import gregtech.api.recipes.ingredients.NBTMatching.NBTMatcher;
 import gregtech.api.recipes.ingredients.NBTMatching.NBTcondition;
 import gregtech.api.recipes.recipeproperties.RecipeProperty;
@@ -215,7 +218,7 @@ public class RecipeBuilder<R extends RecipeBuilder<R>> {
     }
 
     public R notConsumable(GTRecipeInput gtRecipeIngredient) {
-        return inputs(GTRecipeItemInput.getOrCreate(gtRecipeIngredient)
+        return inputs(GTRecipeInput.getOrCreate(gtRecipeIngredient)
                 .setNonConsumable());
     }
 
@@ -328,8 +331,7 @@ public class RecipeBuilder<R extends RecipeBuilder<R>> {
             } else if (fluidStack != null) {
                 GTLog.logger.error("Count cannot be less than 0. Actual: {}.", fluidStack.amount);
                 GTLog.logger.error("Stacktrace:", new IllegalArgumentException());
-            }
-            else {
+            } else {
                 GTLog.logger.error("FluidStack cannot be null.");
             }
         }
@@ -481,7 +483,6 @@ public class RecipeBuilder<R extends RecipeBuilder<R>> {
             } else {
                 newFluidInputs.add(GTRecipeFluidInput.getOrCreate(fi, (fi.getAmount() * numberOfOperations)));
             }
-            ;
         });
 
         recipe.getOutputs().forEach(itemStack ->
@@ -550,14 +551,14 @@ public class RecipeBuilder<R extends RecipeBuilder<R>> {
     protected EnumValidationResult validate() {
         if (EUt == 0) {
             GTLog.logger.error("EU/t cannot be equal to 0", new IllegalArgumentException());
-            if(isCTRecipe) {
+            if (isCTRecipe) {
                 CraftTweakerAPI.logError("EU/t cannot be equal to 0", new IllegalArgumentException());
             }
             recipeStatus = EnumValidationResult.INVALID;
         }
         if (duration <= 0) {
             GTLog.logger.error("Duration cannot be less or equal to 0", new IllegalArgumentException());
-            if(isCTRecipe) {
+            if (isCTRecipe) {
                 CraftTweakerAPI.logError("Duration cannot be less or equal to 0", new IllegalArgumentException());
             }
             recipeStatus = EnumValidationResult.INVALID;
