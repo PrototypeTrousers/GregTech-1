@@ -15,6 +15,8 @@ import org.objectweb.asm.util.ASMifier;
 
 public class GregTechTransformer implements IClassTransformer, Opcodes {
 
+    public static boolean is_currently_computing_frames;
+
     @Override
     public byte[] transform(String name, String transformedName, byte[] basicClass) {
         String internalName = transformedName.replace('.', '/');
@@ -115,7 +117,14 @@ public class GregTechTransformer implements IClassTransformer, Opcodes {
             }
             case NuclearCraftRecipeHelperVisitor.TARGET_CLASS_NAME: {
                 ClassReader classReader = new ClassReader(basicClass);
-                ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
+                ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS) {
+                    @Override
+                    protected String getCommonSuperClass(String type1, String type2) {
+                        if (is_currently_computing_frames)
+                            return "java/lang/Object";
+                        return super.getCommonSuperClass(type1, type2);
+                    }
+                };
                 classReader.accept(new NuclearCraftRecipeHelperVisitor(classWriter), 0);
                 return classWriter.toByteArray();
             }

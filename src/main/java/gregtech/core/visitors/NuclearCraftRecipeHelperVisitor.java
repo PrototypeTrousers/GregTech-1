@@ -1,5 +1,6 @@
 package gregtech.core.visitors;
 
+import gregtech.core.GregTechTransformer;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
@@ -26,6 +27,13 @@ public class NuclearCraftRecipeHelperVisitor extends ClassVisitor implements Opc
 
         public RecipeConflictVisitor(MethodVisitor mv) {
             super(ASM5, mv);
+        }
+
+        @Override
+        public void visitMaxs(int maxStack, int maxLocals) {
+            GregTechTransformer.is_currently_computing_frames = true;
+            super.visitMaxs(maxStack, maxLocals);
+            GregTechTransformer.is_currently_computing_frames = false;
         }
 
         @Override
@@ -91,6 +99,13 @@ public class NuclearCraftRecipeHelperVisitor extends ClassVisitor implements Opc
 
         public NuclearCraftaddRecipeVisitor(MethodVisitor mv) {
             super(ASM5, mv);
+        }
+
+        @Override
+        public void visitMaxs(int maxStack, int maxLocals) {
+            GregTechTransformer.is_currently_computing_frames = true;
+            super.visitMaxs(maxStack, maxLocals);
+            GregTechTransformer.is_currently_computing_frames = false;
         }
 
         @Override
