@@ -37,6 +37,7 @@ public class TargetClassVisitor extends ClassVisitor {
             this.foundMethod = true;
             return visitorCreator.apply(visitor);
         }
+
         return visitor;
     }
 
@@ -44,7 +45,7 @@ public class TargetClassVisitor extends ClassVisitor {
     @Override
     public void visitEnd() {
         super.visitEnd();
-        if (!foundMethod) {
+        if (!foundMethod && visitorCreator != null) {
             FMLLog.log("GregTechTransformer", Level.FATAL, "Failed to find method %s in %s.", methodKey, className);
             throw new RuntimeException("Failed to patch method " + methodKey + ", loading cannot continue. Check your environment is correct.");
         }
