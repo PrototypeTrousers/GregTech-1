@@ -511,6 +511,10 @@ public interface IGTTool extends ItemUIFactory, IAEWrench, IToolWrench, IToolHam
         return definition$getDamage(stack) > 0;
     }
 
+    default boolean definition$isDamageable() {
+        return true;
+    }
+
     default int definition$getDamage(ItemStack stack) {
         NBTTagCompound toolTag = getToolTag(stack);
         if (toolTag.hasKey(DURABILITY_KEY, Constants.NBT.TAG_INT)) {
@@ -705,7 +709,9 @@ public interface IGTTool extends ItemUIFactory, IAEWrench, IToolWrench, IToolHam
         if (ConfigHolder.client.toolCraftingSounds && getSound() != null) {
             if (canPlaySound(stack)) {
                 setLastCraftingSoundTime(stack);
-                player.getEntityWorld().playSound(null, player.posX, player.posY, player.posZ, getSound(), SoundCategory.PLAYERS, 1F, 1F);
+                if (player != null) {
+                    player.getEntityWorld().playSound(null, player.posX, player.posY, player.posZ, getSound(), SoundCategory.PLAYERS, 1F, 1F);
+                }
             }
         }
     }

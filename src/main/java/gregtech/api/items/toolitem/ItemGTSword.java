@@ -217,6 +217,11 @@ public class ItemGTSword extends ItemSword implements IGTTool {
     }
 
     @Override
+    public boolean isDamageable() {
+        return definition$isDamageable();
+    }
+
+    @Override
     public int getDamage(@Nonnull ItemStack stack) {
         return definition$getDamage(stack);
     }

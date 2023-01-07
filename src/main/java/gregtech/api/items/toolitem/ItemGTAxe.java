@@ -209,6 +209,11 @@ public class ItemGTAxe extends ItemAxe implements IGTTool {
     }
 
     @Override
+    public boolean isDamageable() {
+        return definition$isDamageable();
+    }
+
+    @Override
     public int getDamage(@Nonnull ItemStack stack) {
         return definition$getDamage(stack);
     }
