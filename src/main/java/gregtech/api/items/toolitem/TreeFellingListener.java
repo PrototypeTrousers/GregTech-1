@@ -28,8 +28,10 @@ public final class TreeFellingListener {
     private final ItemStack tool;
 
     private ArrayDeque<BlockPos> futureLayer;
+    private ArrayDeque<BlockPos> leafToBreak;
+
     private Deque<BlockPos> orderedBlocks;
-    private final Deque<BlockPos> leafBlocks;
+    private final ArrayDeque<BlockPos> leafBlocks;
     private final Block logBlock;
     private final BlockPos startPos;
     private int pass = 0;
@@ -42,6 +44,7 @@ public final class TreeFellingListener {
         this.orderedBlocks = new ArrayDeque<>();
         this.futureLayer = new ArrayDeque<>();
         this.leafBlocks = new ArrayDeque<>();
+        this.leafToBreak = new ArrayDeque<>();
     }
 
     public static void start(@Nonnull IBlockState state, ItemStack tool, BlockPos start, @Nonnull EntityPlayerMP player) {
@@ -52,14 +55,15 @@ public final class TreeFellingListener {
     public void onWorldTick(@Nonnull TickEvent.WorldTickEvent event) {
         if (event.phase == TickEvent.Phase.START && event.world == player.world && event.side == Side.SERVER) {
             if (orderedBlocks.isEmpty()) {
-                gatherLogLayer();
+                gatherLogLayer(event.world);
                 gatherLeafs(event.world);
                 pass++;
             }
 
             if (orderedBlocks.isEmpty()) {
-                while (!leafBlocks.isEmpty()) {
-                    BlockPos check = leafBlocks.pop();
+                gatherLeafs2(event.world);
+                while (!leafToBreak.isEmpty()) {
+                    BlockPos check = leafToBreak.pop();
                     IBlockState state = event.world.getBlockState(check);
 
                     if (state == Blocks.AIR.getDefaultState()) continue;
@@ -85,12 +89,15 @@ public final class TreeFellingListener {
                 MinecraftForge.EVENT_BUS.unregister(this);
                 return;
             }
-            ToolHelper.breakBlockRoutine(player, tool, orderedBlocks.removeLast());
+            int breaks = 10;
+            while (!orderedBlocks.isEmpty() && breaks > 0) {
+                ToolHelper.breakBlockRoutine(player, tool, orderedBlocks.removeLast());
+                breaks--;
+            }
         }
     }
 
-    private void gatherLogLayer() {
-        World world = player.world;
+    private void gatherLogLayer(World world) {
         BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos();
 
         if (pass == 0) {
@@ -137,12 +144,7 @@ public final class TreeFellingListener {
     private void gatherLeafs(World world) {
         //Gather the leaves from an area determined by the amount of faces a log block not touching another log block.
         BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos();
-        BlockPos.MutableBlockPos maxXYZ = new BlockPos.MutableBlockPos();
-        BlockPos.MutableBlockPos minXYZ = new BlockPos.MutableBlockPos();
-        ArrayDeque<BlockPos> toBreak = new ArrayDeque<>();
         ArrayDeque<BlockPos> visited = new ArrayDeque<>();
-
-        int faces = 0;
 
         for (BlockPos b : orderedBlocks) {
             //Loop of the faces of the log and look for leaves or air to determine the area that might contain leaves
@@ -150,60 +152,68 @@ public final class TreeFellingListener {
             for (EnumFacing e : EnumFacing.VALUES) {
                 mutablePos.setPos(b);
                 mutablePos.move(e);
-                if (pass == 1) {
-                    if (mutablePos.equals(startPos)) {
+                if (!visited.contains(mutablePos)) {
+                    BlockPos immutable = mutablePos.toImmutable();
+                    if (!leafBlocks.contains(mutablePos)) {
+                        IBlockState bs = world.getBlockState(mutablePos);
+                        if (bs.getMaterial() == Material.LEAVES) {
+                            leafBlocks.add(immutable);
+                        }
+                    }
+                    visited.add(immutable);
+                }
+            }
+        }
+    }
+
+    private void gatherLeafs2(World world) {
+        if (!leafBlocks.isEmpty()) {
+            BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos();
+            ArrayDeque<BlockPos> visited = new ArrayDeque<>();
+
+            ArrayDeque<BlockPos> toGatherFrom = leafBlocks;
+            ArrayDeque<BlockPos> next = new ArrayDeque<>();
+
+            int stepsLeft = 4;
+            boolean stfn = false;
+            boolean stem;
+
+            while (!toGatherFrom.isEmpty() && stepsLeft > 0) {
+                stem = stepsLeft == 4;
+
+                BlockPos p = toGatherFrom.pop();
+                for (EnumFacing e : EnumFacing.VALUES) {
+                    if (e == EnumFacing.UP && stfn) {
                         continue;
                     }
-                }
-                IBlockState bs = world.getBlockState(mutablePos);
-                if (bs.getMaterial() == Material.LEAVES || bs.getBlock() == Blocks.AIR) {
-                    //Add the face to be checked later
-                    faces = faces | 1 << e.getIndex();
-                }
-            }
-            if (faces > 0) {
-                for (int distance = 1; distance < 4; distance++) {
-                    minXYZ.setPos(b);
-                    maxXYZ.setPos(b);
-                    boolean anyLeafs = false;
-                    for (EnumFacing facing : EnumFacing.VALUES) {
-                        //if the face was added grow in that direction
-                        if ((faces & 1 << facing.getIndex()) > 0) {
-                            if (facing.getAxisDirection() == EnumFacing.AxisDirection.POSITIVE) {
-                                maxXYZ.move(facing, distance);
-                            } else {
-                                minXYZ.move(facing, distance);
+                    mutablePos.setPos(p);
+                    mutablePos.move(e);
+                    if (!visited.contains(mutablePos)) {
+                        if (stem && e == EnumFacing.UP) {
+                            if (leafBlocks.contains(mutablePos)) {
+                                stfn = true;
                             }
                         }
-                    }
-                    //checks the blocks in the volume determined before for leaf blocks
-                    for (int y = minXYZ.getY(); y <= maxXYZ.getY(); y++) {
-                        for (int x = minXYZ.getX(); x <= maxXYZ.getX(); x++) {
-                            for (int z = minXYZ.getZ(); z <= maxXYZ.getZ(); z++) {
-                                if (x != 0 || y != 0 || z != 0) {
-                                    mutablePos.setPos(x, y, z);
-                                    if (!visited.contains(mutablePos)) {
-                                        BlockPos immutable = mutablePos.toImmutable();
-                                        if (!toBreak.contains(mutablePos)) {
-                                            IBlockState bs = world.getBlockState(mutablePos);
-                                            if (bs.getMaterial() == Material.LEAVES) {
-                                                toBreak.add(immutable);
-                                                anyLeafs = true;
-                                            }
-                                        }
-                                        visited.add(immutable);
-                                    }
-                                }
+                        BlockPos immutable = mutablePos.toImmutable();
+
+                        if (!toGatherFrom.contains(mutablePos)) {
+                            IBlockState bs = world.getBlockState(mutablePos);
+                            if (bs.getMaterial() == Material.LEAVES) {
+                                leafToBreak.add(immutable);
+                                next.add(immutable);
                             }
                         }
-                    }
-                    if (!anyLeafs) {
-                        break;
+                        visited.add(immutable);
                     }
                 }
+
+                if (toGatherFrom.isEmpty()) {
+                    toGatherFrom = next;
+                    stepsLeft--;
+                    next = new ArrayDeque<>();
+
+                }
             }
-            faces = 0;
         }
-        leafBlocks.addAll(toBreak);
     }
 }
