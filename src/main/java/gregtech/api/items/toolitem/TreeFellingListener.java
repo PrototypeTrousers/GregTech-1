@@ -169,49 +169,60 @@ public final class TreeFellingListener {
     private void gatherLeafs2(World world) {
         if (!leafBlocks.isEmpty()) {
             BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos();
-            ArrayDeque<BlockPos> visited = new ArrayDeque<>();
 
-            ArrayDeque<BlockPos> toGatherFrom = leafBlocks;
+            ArrayDeque<BlockPos> toGatherFrom;
             ArrayDeque<BlockPos> next = new ArrayDeque<>();
 
-            int stepsLeft = 4;
-            boolean stfn = false;
-            boolean stem;
+            while (!leafBlocks.isEmpty()) {
+                ArrayDeque<BlockPos> visited = new ArrayDeque<>();
 
-            while (!toGatherFrom.isEmpty() && stepsLeft > 0) {
-                stem = stepsLeft == 4;
+                int stepsLeft = 5;
+                boolean stfn = false;
+                boolean stem;
+                toGatherFrom = new ArrayDeque<>();
+                toGatherFrom.add(leafBlocks.pop());
 
-                BlockPos p = toGatherFrom.pop();
-                for (EnumFacing e : EnumFacing.VALUES) {
-                    if (e == EnumFacing.UP && stfn) {
-                        continue;
-                    }
-                    mutablePos.setPos(p);
-                    mutablePos.move(e);
-                    if (!visited.contains(mutablePos)) {
-                        if (stem && e == EnumFacing.UP) {
-                            if (leafBlocks.contains(mutablePos)) {
-                                stfn = true;
+                while (!toGatherFrom.isEmpty() && stepsLeft > 0) {
+                    stem = stepsLeft == 5;
+
+                    BlockPos p = toGatherFrom.pop();
+                    leafToBreak.add(p);
+                    for (EnumFacing e : EnumFacing.VALUES) {
+                        if (e == EnumFacing.UP && stfn) {
+                            if (!leafBlocks.contains(mutablePos)) {
+                                stfn = false;
+                            } else {
+                                continue;
                             }
                         }
-                        BlockPos immutable = mutablePos.toImmutable();
-
-                        if (!toGatherFrom.contains(mutablePos)) {
-                            IBlockState bs = world.getBlockState(mutablePos);
-                            if (bs.getMaterial() == Material.LEAVES) {
-                                leafToBreak.add(immutable);
-                                next.add(immutable);
+                        mutablePos.setPos(p);
+                        mutablePos.move(e);
+                        if (!visited.contains(mutablePos)) {
+                            if (e == EnumFacing.UP) {
+                                if (stem) {
+                                    if (leafBlocks.contains(mutablePos)) {
+                                        stfn = true;
+                                    }
+                                }
                             }
+                            BlockPos immutable = mutablePos.toImmutable();
+
+                            if (!toGatherFrom.contains(mutablePos)) {
+                                IBlockState bs = world.getBlockState(mutablePos);
+                                if (bs.getMaterial() == Material.LEAVES) {
+                                    next.add(immutable);
+                                }
+                            }
+                            visited.add(immutable);
                         }
-                        visited.add(immutable);
                     }
-                }
 
-                if (toGatherFrom.isEmpty()) {
-                    toGatherFrom = next;
-                    stepsLeft--;
-                    next = new ArrayDeque<>();
+                    if (toGatherFrom.isEmpty()) {
+                        toGatherFrom = next;
+                        stepsLeft--;
+                        next = new ArrayDeque<>();
 
+                    }
                 }
             }
         }
