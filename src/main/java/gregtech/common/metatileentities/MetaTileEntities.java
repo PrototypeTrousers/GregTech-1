@@ -217,7 +217,6 @@ public class MetaTileEntities {
     public static MetaTileEntityCrate TITANIUM_CRATE;
     public static MetaTileEntityCrate TUNGSTENSTEEL_CRATE;
     //MISC MACHINES SECTION
-    public static MetaTileEntityWorkbench WORKBENCH;
     public static MetaTileEntityCreativeEnergy CREATIVE_ENERGY;
     public static MetaTileEntityCreativeTank CREATIVE_TANK;
     public static MetaTileEntityCreativeChest CREATIVE_CHEST;
@@ -701,7 +700,6 @@ public class MetaTileEntities {
 
         // Misc, IDs 1646-1999
         LOCKED_SAFE = registerMetaTileEntity(1646, new MetaTileEntityLockedSafe(gregtechId("locked_safe")));
-        WORKBENCH = registerMetaTileEntity(1647, new MetaTileEntityWorkbench(gregtechId("workbench")));
         PRIMITIVE_WATER_PUMP = registerMetaTileEntity(1648, new MetaTileEntityPrimitiveWaterPump(gregtechId("primitive_water_pump")));
         PUMP_OUTPUT_HATCH = registerMetaTileEntity(1649, new MetaTileEntityPumpHatch(gregtechId("pump_hatch")));
 

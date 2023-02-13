@@ -2508,17 +2508,6 @@ gregtech.machine.locked_safe.name=秘密保险柜
 gregtech.machine.locked_safe.malfunctioning=§c故障!
 gregtech.machine.locked_safe.requirements=§7需要更换以下物品:
 
-#Workbench
-gregtech.machine.workbench.name=先进合成站
-gregtech.machine.workbench.tab.workbench=合成
-gregtech.machine.workbench.tab.item_list=存储
-gregtech.machine.workbench.storage_note_1=(相连的物品容器中
-gregtech.machine.workbench.storage_note_2=可参与合成的物品)
-gregtech.item_list.item_stored=§7存量: %,d
-
-gregtech.machine.workbench.tab.crafting=合成
-gregtech.machine.workbench.tab.container=存储
-
 # Tanks
 gregtech.machine.tank_valve.wood.name=木质储罐阀门
 gregtech.machine.tank.wood.name=木质多方块储罐

@@ -21,7 +21,6 @@ import gregtech.api.worldgen.config.BedrockFluidDepositDefinition;
 import gregtech.api.worldgen.config.OreDepositDefinition;
 import gregtech.api.worldgen.config.WorldGenRegistry;
 import gregtech.common.blocks.MetaBlocks;
-import gregtech.common.gui.widget.craftingstation.CraftingSlotWidget;
 import gregtech.common.items.MetaItems;
 import gregtech.common.metatileentities.MetaTileEntities;
 import gregtech.integration.jei.basic.*;
@@ -101,14 +100,10 @@ public class GTJeiPlugin implements IModPlugin {
 
         // register transfer handler for all categories, but not for the crafting station
         ModularUIGuiHandler modularUIGuiHandler = new ModularUIGuiHandler(jeiHelpers.recipeTransferHandlerHelper());
-        modularUIGuiHandler.setValidHandlers(widget -> !(widget instanceof CraftingSlotWidget));
         registry.getRecipeTransferRegistry().addRecipeTransferHandler(modularUIGuiHandler, Constants.UNIVERSAL_RECIPE_TRANSFER_UID);
 
         registry.addAdvancedGuiHandlers(modularUIGuiHandler);
         registry.addGhostIngredientHandler(modularUIGuiHandler.getGuiContainerClass(), modularUIGuiHandler);
-        // register transfer handler for crafting recipes
-        ModularUIGuiHandler craftingStationGuiHandler = new ModularUIGuiHandler(jeiHelpers.recipeTransferHandlerHelper());
-        registry.getRecipeTransferRegistry().addRecipeTransferHandler(craftingStationGuiHandler, VanillaRecipeCategoryUid.CRAFTING);
 
         for (RecipeMap<?> recipeMap : RecipeMap.getRecipeMaps()) {
             if (!recipeMap.isHidden) {
@@ -215,8 +210,6 @@ public class GTJeiPlugin implements IModPlugin {
             registry.addIngredientInfo(IntCircuitIngredient.getIntegratedCircuit(i), VanillaTypes.ITEM,
                     "metaitem.circuit.integrated.jei_description");
         }
-
-        registry.addRecipeCatalyst(MetaTileEntities.WORKBENCH.getStackForm(), VanillaRecipeCategoryUid.CRAFTING);
 
         for (MetaTileEntity machine : MetaTileEntities.CANNER) {
             if (machine == null) continue;

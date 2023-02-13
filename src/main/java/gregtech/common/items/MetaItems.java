@@ -431,7 +431,6 @@ public final class MetaItems {
     public static MetaItem<?>.MetaValueItem COVER_ENERGY_DETECTOR_ADVANCED;
 
     public static MetaItem<?>.MetaValueItem COVER_SCREEN;
-    public static MetaItem<?>.MetaValueItem COVER_CRAFTING;
     public static MetaItem<?>.MetaValueItem COVER_INFINITE_WATER;
     public static MetaItem<?>.MetaValueItem COVER_ENDER_FLUID_LINK;
     public static MetaItem<?>.MetaValueItem COVER_DIGITAL_INTERFACE;

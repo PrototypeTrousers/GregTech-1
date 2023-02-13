@@ -2441,19 +2441,6 @@ gregtech.machine.locked_safe.name=金庫
 gregtech.machine.locked_safe.malfunctioning=§c故障中!
 gregtech.machine.locked_safe.requirements=§7要交換部品:
 
-# Workbench
-gregtech.machine.workbench.name=クラフティングステーション
-gregtech.machine.workbench.tooltip1=Forestryのワークベンチより優秀
-gregtech.machine.workbench.tooltip2=アイテム / ツール用のストレージを持ち、隣接インベントリのアイテムを認識し、レシピを記憶する。
-gregtech.machine.workbench.tab.workbench=クラフト
-gregtech.machine.workbench.tab.item_list=ストレージ
-gregtech.machine.workbench.storage_note_1=(隣接ストレージのアイテムを
-gregtech.machine.workbench.storage_note_2=クラフトに使用できます)
-gregtech.item_list.item_stored=§7在庫: %,d
-
-gregtech.machine.workbench.tab.crafting=クラフト
-gregtech.machine.workbench.tab.container=ストレージ
-
 # Tanks
 gregtech.machine.tank_valve.wood.name=木製タンクバルブ
 gregtech.machine.tank.wood.name=木製マルチブロックタンク

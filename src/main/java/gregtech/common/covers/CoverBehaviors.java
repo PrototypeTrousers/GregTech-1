@@ -72,7 +72,6 @@ public class CoverBehaviors {
         registerBehavior(75, new ResourceLocation(GTValues.MODID, "item_detector_advanced"), MetaItems.COVER_ITEM_DETECTOR_ADVANCED, CoverDetectorItemAdvanced::new);
         registerBehavior(53, new ResourceLocation(GTValues.MODID, "activity_detector"), MetaItems.COVER_ACTIVITY_DETECTOR, CoverActivityDetector::new);
         registerBehavior(54, new ResourceLocation(GTValues.MODID, "activity_detector_advanced"), MetaItems.COVER_ACTIVITY_DETECTOR_ADVANCED, CoverActivityDetectorAdvanced::new);
-        registerBehavior(55, new ResourceLocation(GTValues.MODID, "crafting_table"), MetaItems.COVER_CRAFTING, CoverCraftingTable::new);
         registerBehavior(56, new ResourceLocation(GTValues.MODID, "infinite_water"), MetaItems.COVER_INFINITE_WATER, CoverInfiniteWater::new);
         registerBehavior(57, new ResourceLocation(GTValues.MODID, "ender_fluid_link"), MetaItems.COVER_ENDER_FLUID_LINK, CoverEnderFluidLink::new);
         registerBehavior(58, new ResourceLocation(GTValues.MODID, "cover.digital"), MetaItems.COVER_DIGITAL_INTERFACE, CoverDigitalInterface::new);

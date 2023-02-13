@@ -7,7 +7,6 @@ import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import gregtech.api.terminal.app.AbstractApplication;
 import gregtech.api.terminal.gui.widgets.MachineSceneWidget;
 import gregtech.api.terminal.os.TerminalDialogWidget;
-import gregtech.common.metatileentities.storage.MetaTileEntityWorkbench;
 import net.minecraft.tileentity.TileEntity;
 
 public class ConsoleApp extends AbstractApplication {
@@ -30,9 +29,7 @@ public class ConsoleApp extends AbstractApplication {
     public AbstractApplication initApp() {
         IGregTechTileEntity mteResult = getMTE();
 
-        if (mteResult == null ||
-            mteResult.getMetaTileEntity() instanceof MetaTileEntityWorkbench) // Remove Crafting Station compat
-        { // 333 232
+        if (mteResult == null) { // 333 232
             TerminalDialogWidget.showInfoDialog(os,
                     "terminal.dialog.notice",
                     "terminal.console.notice",

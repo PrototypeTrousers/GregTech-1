@@ -831,8 +831,6 @@ metaitem.cover.facade.tooltip=Decorative Outfit §fCover§7.
 
 metaitem.cover.screen.name=Computer Monitor
 metaitem.cover.screen.tooltip=Displays §fData§7 as §fCover§7.
-metaitem.cover.crafting.name=Crafting Table Cover
-metaitem.cover.crafting.tooltip=§fAdvanced Workbench§7 on a Machine as §fCover§7.
 metaitem.cover.shutter.name=Shutter Module
 metaitem.cover.shutter.tooltip=§fBlocks Transfer§7 through attached Side as §fCover§7.
 
@@ -2457,19 +2455,6 @@ gregtech.machine.crate.tungstensteel.name=Tungstensteel Crate
 gregtech.machine.locked_safe.name=Locked Safe
 gregtech.machine.locked_safe.malfunctioning=§cMalfunctioning!
 gregtech.machine.locked_safe.requirements=§7Replacements required:
-
-# Workbench
-gregtech.machine.workbench.name=Crafting Station
-gregtech.machine.workbench.tooltip1=Better than Forestry
-gregtech.machine.workbench.tooltip2=Has Item Storage, Tool Storage, pulls from adjacent Inventories, and saves Recipes.
-gregtech.machine.workbench.tab.workbench=Crafting
-gregtech.machine.workbench.tab.item_list=Storage
-gregtech.machine.workbench.storage_note_1=(Available items from connected
-gregtech.machine.workbench.storage_note_2=inventories usable for crafting)
-gregtech.item_list.item_stored=§7Stored: %,d
-
-gregtech.machine.workbench.tab.crafting=Crafting
-gregtech.machine.workbench.tab.container=Container
 
 # Tanks
 gregtech.machine.tank_valve.wood.name=Wooden Tank Valve
