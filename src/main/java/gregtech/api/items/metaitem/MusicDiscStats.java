@@ -30,6 +30,10 @@ public class MusicDiscStats implements IMusicDisc, IItemBehaviour {
         return sound;
     }
 
+    public String getName() {
+        return sound.getSoundName().getPath();
+    }
+
     @Override
     public ActionResult<ItemStack> onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         IBlockState iblockstate = world.getBlockState(pos);

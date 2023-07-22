@@ -41,14 +41,3 @@ dependencies {
     compileOnlyApi rfg.deobf("curse.maven:hwyla-253449:2568751") // HWYLA 1.8.26-B41
     compileOnlyApi rfg.deobf("curse.maven:baubles-227083:2518667") // Baubles 1.5.2
 }
-
-minecraft {
-    injectedTags.put('DEP_VERSION_STRING', "required-after:gregtech@[${modVersion},);")
-}
-
-configurations {
-    compileClassPath {
-        // exclude GNU trove, FastUtil is superior and still updated
-        exclude group: "net.sf.trove4j", module: "trove4j"
-    }
-}
