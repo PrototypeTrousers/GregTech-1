@@ -48,6 +48,7 @@ public class DamageSources {
         return TURBINE;
     }
 
+    // TODO Remove
     // accessed via ASM
     @SuppressWarnings("unused")
     public static DamageSource getPlayerDamage(@Nullable EntityPlayer source) {
