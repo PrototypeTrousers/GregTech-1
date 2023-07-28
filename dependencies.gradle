@@ -46,6 +46,14 @@ minecraft {
     injectedTags.put('DEP_VERSION_STRING', "required-after:gregtech@[${modVersion},);")
 }
 
+minecraft {
+    extraRunJvmArguments.addAll([
+            "-Dlegacy.debugClassLoading=true",
+            "-Dlegacy.debugClassLoadingFiner=true",
+            "-Dlegacy.debugClassLoadingSave=true"
+    ])
+}
+
 configurations {
     compileClassPath {
         // exclude GNU trove, FastUtil is superior and still updated
