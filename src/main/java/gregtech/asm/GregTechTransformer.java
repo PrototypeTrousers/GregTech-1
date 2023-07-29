@@ -174,10 +174,14 @@ public class GregTechTransformer implements IClassTransformer, Opcodes {
                 classReader.accept(new TargetClassVisitor(classWriter, ModelLoaderRegistryVisitor.TARGET_METHOD, ModelLoaderRegistryVisitor::new), ClassReader.EXPAND_FRAMES);
                 return classWriter.toByteArray();
             }
-            case TileEntityVisitor.TARGET_CLASS_NAME: {
+            case TileEntityVisitor2.TARGET_CLASS_NAME: {
+                ClassNode classNode = new ClassNode();
                 ClassReader classReader = new ClassReader(basicClass);
-                ClassWriter classWriter = new ClassWriter(0);
-                classReader.accept(new TargetClassVisitor(classWriter, TileEntityVisitor.TARGET_METHOD, TileEntityVisitor::new), ClassWriter.COMPUTE_FRAMES);
+                classReader.accept(classNode, ClassReader.EXPAND_FRAMES);
+                Iterator<MethodNode> methods = classNode.methods.iterator();
+                TileEntityVisitor2.transform(methods);
+                ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
+                classNode.accept(classWriter);
                 return classWriter.toByteArray();
             }
         }
