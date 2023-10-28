@@ -46,7 +46,7 @@ public abstract class AbstractRecipeLogic extends MTETrait implements IWorkable,
     protected Recipe previousRecipe;
     private boolean allowOverclocking = true;
     protected int parallelRecipesPerformed;
-    private long overclockVoltage = 0;
+    long overclockVoltage = 0;
     protected int[] overclockResults;
 
     protected boolean canRecipeProgress = true;
@@ -638,7 +638,7 @@ public abstract class AbstractRecipeLogic extends MTETrait implements IWorkable,
      * @return an int array of {OverclockedEUt, OverclockedDuration}
      */
     @Nonnull
-    protected int[] performOverclocking(@Nonnull Recipe recipe) {
+    public int[] performOverclocking(@Nonnull Recipe recipe) {
         int[] values = {recipe.getEUt(), recipe.getDuration(), getNumberOfOCs(recipe.getEUt())};
         modifyOverclockPre(values, recipe.getRecipePropertyStorage());
 
@@ -915,6 +915,10 @@ public abstract class AbstractRecipeLogic extends MTETrait implements IWorkable,
         this.overclockVoltage = overclockVoltage;
         // Overclocking is not allowed if the passed voltage is ULV
         this.allowOverclocking = (overclockVoltage != GTValues.V[GTValues.ULV]);
+        World world = metaTileEntity.getWorld();
+        if (world != null && !world.isRemote) {
+            writeCustomData(GregtechDataCodes.OVERCLOCKING_VOLTAGE, buf -> buf.writeLong(overclockVoltage));
+        }
         metaTileEntity.markDirty();
     }
 
@@ -959,6 +963,8 @@ public abstract class AbstractRecipeLogic extends MTETrait implements IWorkable,
         } else if (dataId == GregtechDataCodes.WORKING_ENABLED) {
             this.workingEnabled = buf.readBoolean();
             getMetaTileEntity().scheduleRenderUpdate();
+        } else if (dataId == GregtechDataCodes.OVERCLOCKING_VOLTAGE) {
+            this.overclockVoltage = buf.readLong();
         }
     }
 
@@ -966,12 +972,14 @@ public abstract class AbstractRecipeLogic extends MTETrait implements IWorkable,
     public void writeInitialData(@Nonnull PacketBuffer buf) {
         buf.writeBoolean(this.isActive);
         buf.writeBoolean(this.workingEnabled);
+        buf.writeLong(getMaxVoltage());
     }
 
     @Override
     public void receiveInitialData(@Nonnull PacketBuffer buf) {
         this.isActive = buf.readBoolean();
         this.workingEnabled = buf.readBoolean();
+        this.overclockVoltage = buf.readLong();
     }
 
     @Nonnull

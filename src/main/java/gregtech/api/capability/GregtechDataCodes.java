@@ -87,6 +87,9 @@ public class GregtechDataCodes {
     // Assembly Line
     public static final int UPDATE_PARTICLE = 371;
 
+    // Blast Furnace
+    public static final int UPDATE_COIL_HEAT = 1;
+
     // Central Monitor
     public static final int UPDATE_ALL = 1;
     public static final int UPDATE_COVERS = 2;
@@ -121,6 +124,7 @@ public class GregtechDataCodes {
     // Recipe Logic
     public static final int WORKABLE_ACTIVE = 1;
     public static final int WORKING_ENABLED = 5;
+    public static final int OVERCLOCKING_VOLTAGE = 10;
 
     // Creative Energy
     public static final int UPDATE_IO_SPEED = 1;

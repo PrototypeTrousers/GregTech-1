@@ -31,6 +31,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
@@ -47,6 +48,9 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+
+import static gregtech.api.capability.GregtechDataCodes.BOILER_HEAT;
+import static gregtech.api.capability.GregtechDataCodes.UPDATE_COIL_HEAT;
 
 public class MetaTileEntityElectricBlastFurnace extends RecipeMapMultiblockController implements IHeatingCoil {
 
@@ -82,6 +86,7 @@ public class MetaTileEntityElectricBlastFurnace extends RecipeMapMultiblockContr
         }
         //the subtracted tier gives the starting level (exclusive) of the +100K heat bonus
         this.blastFurnaceTemperature += 100 * Math.max(0, GTUtility.getFloorTierByVoltage(getEnergyContainer().getInputVoltage()) - GTValues.MV);
+        writeCustomData(UPDATE_COIL_HEAT, b -> b.writeInt(blastFurnaceTemperature));
     }
 
     @Override
@@ -185,5 +190,25 @@ public class MetaTileEntityElectricBlastFurnace extends RecipeMapMultiblockContr
         list.add(new TextComponentTranslation("gregtech.multiblock.blast_furnace.max_temperature",
                 new TextComponentTranslation(TextFormattingUtil.formatNumbers(blastFurnaceTemperature) + "K").setStyle(new Style().setColor(TextFormatting.RED))));
         return list;
+    }
+
+    @Override
+    public void receiveCustomData(int dataId, PacketBuffer buf) {
+        super.receiveCustomData(dataId,buf);
+        if (dataId == UPDATE_COIL_HEAT) {
+            this.blastFurnaceTemperature = buf.readInt();
+        }
+    }
+
+    @Override
+    public void writeInitialSyncData(PacketBuffer buf) {
+        super.writeInitialSyncData(buf);
+        buf.writeInt(blastFurnaceTemperature);
+    }
+
+    @Override
+    public void receiveInitialSyncData(PacketBuffer buf) {
+        super.receiveInitialSyncData(buf);
+        blastFurnaceTemperature = buf.readInt();
     }
 }

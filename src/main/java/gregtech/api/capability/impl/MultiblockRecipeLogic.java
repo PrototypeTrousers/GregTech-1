@@ -10,7 +10,9 @@ import gregtech.api.recipes.RecipeMap;
 import gregtech.api.recipes.recipeproperties.IRecipePropertyStorage;
 import gregtech.api.util.GTUtility;
 import gregtech.common.ConfigHolder;
+import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.util.Tuple;
+import net.minecraft.world.World;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
@@ -63,6 +65,7 @@ public class MultiblockRecipeLogic extends AbstractRecipeLogic {
         isOutputsFull = false;
         invalidInputsForRecipes = false;
         invalidatedInputList.clear();
+        overclockVoltage = 0;
         setActive(false); // this marks dirty for us
     }
 
@@ -369,6 +372,10 @@ public class MultiblockRecipeLogic extends AbstractRecipeLogic {
 
     @Override
     protected long getMaxVoltage() {
+        World world = this.metaTileEntity.getWorld();
+        if (world != null && world.isRemote) {
+            return overclockVoltage;
+        }
         IEnergyContainer energyContainer = getEnergyContainer();
         if (energyContainer instanceof EnergyContainerList) {
             long voltage;
@@ -385,15 +392,33 @@ public class MultiblockRecipeLogic extends AbstractRecipeLogic {
                 // amperage is 1 when the energy is not exactly on a tier
 
                 // the voltage for recipe search is always on tier, so take the closest lower tier
-                return GTValues.V[GTUtility.getFloorTierByVoltage(voltage)];
+                long maxVoltage =  GTValues.V[GTUtility.getFloorTierByVoltage(voltage)];
+
+                if (maxVoltage != overclockVoltage) {
+                    writeCustomData(GregtechDataCodes.OVERCLOCKING_VOLTAGE, buf -> buf.writeLong(maxVoltage));
+                    overclockVoltage = maxVoltage;
+                }
+
+                return maxVoltage;
             } else {
                 // amperage != 1 means the voltage is exactly on a tier
                 // ignore amperage, since only the voltage is relevant for recipe search
                 // amps are never > 3 in an EnergyContainerList
+
+                if (voltage != overclockVoltage) {
+                    writeCustomData(GregtechDataCodes.OVERCLOCKING_VOLTAGE, buf -> buf.writeLong(voltage));
+                    overclockVoltage = voltage;
+                }
+
                 return voltage;
             }
         }
-        return Math.max(energyContainer.getInputVoltage(), energyContainer.getOutputVoltage());
+        long maxVoltage = Math.max(energyContainer.getInputVoltage(), energyContainer.getOutputVoltage());
+        if (maxVoltage != overclockVoltage) {
+            writeCustomData(GregtechDataCodes.OVERCLOCKING_VOLTAGE, buf -> buf.writeLong(maxVoltage));
+            overclockVoltage = maxVoltage;
+        }
+        return maxVoltage;
     }
 
     @Nullable

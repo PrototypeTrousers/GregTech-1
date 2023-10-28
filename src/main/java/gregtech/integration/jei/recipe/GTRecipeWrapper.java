@@ -2,10 +2,14 @@ package gregtech.integration.jei.recipe;
 
 import gregtech.api.GTValues;
 import gregtech.api.gui.GuiTextures;
+import gregtech.api.gui.impl.ModularUIContainer;
 import gregtech.api.gui.widgets.TankWidget;
 import gregtech.api.items.metaitem.MetaItem;
 import gregtech.api.items.metaitem.stats.IDataItem;
 import gregtech.api.items.metaitem.stats.IItemBehaviour;
+import gregtech.api.metatileentity.MetaTileEntity;
+import gregtech.api.metatileentity.MetaTileEntityHolder;
+import gregtech.api.metatileentity.multiblock.RecipeMapMultiblockController;
 import gregtech.api.recipes.Recipe;
 import gregtech.api.recipes.Recipe.ChanceEntry;
 import gregtech.api.recipes.RecipeMap;
@@ -192,6 +196,23 @@ public class GTRecipeWrapper extends AdvancedRecipeWrapper {
 
         int yPosition = recipeHeight - ((recipe.getUnhiddenPropertyCount() + defaultLines) * 10 - 3);
 
+        int[] oc = null;
+        if (minecraft.player.openContainer instanceof ModularUIContainer modularUIContainer) {
+            if (modularUIContainer.getModularUI().holder instanceof MetaTileEntityHolder holder) {
+                MetaTileEntity mte = holder.getMetaTileEntity();
+                if (mte != null) {
+                    RecipeMap<?> rm = holder.getMetaTileEntity().getRecipeMap();
+                    if (rm != null) {
+                        if (recipe.getRecipeCategory().getRecipeMap() == rm) {
+                            if (!(mte instanceof RecipeMapMultiblockController multiblockController) || multiblockController.isStructureFormed()) {
+                                oc = mte.getRecipeLogic().performOverclocking(recipe);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         // Default entries
         if (drawTotalEU) {
             long eu = Math.abs((long) recipe.getEUt()) * recipe.getDuration();
@@ -203,11 +224,20 @@ public class GTRecipeWrapper extends AdvancedRecipeWrapper {
                 minecraft.fontRenderer.drawString(I18n.format("gregtech.recipe.total", eu), 0, yPosition, 0x111111);
             }
         }
+
         if (drawEUt) {
-            minecraft.fontRenderer.drawString(I18n.format(recipe.getEUt() >= 0 ? "gregtech.recipe.eu" : "gregtech.recipe.eu_inverted", Math.abs(recipe.getEUt()), GTValues.VN[GTUtility.getTierByVoltage(recipe.getEUt())]), 0, yPosition += LINE_HEIGHT, 0x111111);
+            if (oc != null && recipe.getEUt() >0 ) {
+                minecraft.fontRenderer.drawString(I18n.format("gregtech.overclockedrecipe.eu" , Math.abs(recipe.getEUt()), Math.abs(oc[0]), GTValues.VN[GTUtility.getTierByVoltage(recipe.getEUt())], GTValues.VN[GTUtility.getTierByVoltage(oc[0])]), 0, yPosition += LINE_HEIGHT, 0x111111);
+            }else {
+                minecraft.fontRenderer.drawString(I18n.format(recipe.getEUt() >= 0 ? "gregtech.recipe.eu" : "gregtech.recipe.eu_inverted", Math.abs(recipe.getEUt()), GTValues.VN[GTUtility.getTierByVoltage(recipe.getEUt())]), 0, yPosition += LINE_HEIGHT, 0x111111);
+            }
         }
         if (drawDuration) {
-            minecraft.fontRenderer.drawString(I18n.format("gregtech.recipe.duration", TextFormattingUtil.formatNumbers(recipe.getDuration() / 20d)), 0, yPosition += LINE_HEIGHT, 0x111111);
+            if (oc != null) {
+                minecraft.fontRenderer.drawString(I18n.format("gregtech.recipe.overclockedduration", TextFormattingUtil.formatNumbers(recipe.getDuration() / 20d), TextFormattingUtil.formatNumbers(oc[1] / 20d)), 0, yPosition += LINE_HEIGHT, 0x111111);
+            } else {
+                minecraft.fontRenderer.drawString(I18n.format("gregtech.recipe.duration", TextFormattingUtil.formatNumbers(recipe.getDuration() / 20d)), 0, yPosition += LINE_HEIGHT, 0x111111);
+            }
         }
 
         // Property custom entries
