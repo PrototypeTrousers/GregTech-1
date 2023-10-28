@@ -130,7 +130,14 @@ public class JustEnoughItemsModule extends IntegrationSubmodule implements IModP
                 GTValues.MODID + ":material_tree",
                 VanillaRecipeCategoryUid.INFORMATION,
                 VanillaRecipeCategoryUid.FUEL);
-        registry.getRecipeTransferRegistry().addRecipeTransferHandler(modularUIGuiHandler, Constants.UNIVERSAL_RECIPE_TRANSFER_UID);
+
+        for (RecipeMap<?> recipeMap : RecipeMap.getRecipeMaps()) {
+            if (!recipeMap.isHidden) {
+                for (Map.Entry<GTRecipeCategory, List<Recipe>> entry : recipeMap.getRecipesByCategory().entrySet()) {
+                    registry.getRecipeTransferRegistry().addRecipeTransferHandler(modularUIGuiHandler, entry.getKey().getUniqueID());
+                }
+            }
+        }
 
         registry.addAdvancedGuiHandlers(modularUIGuiHandler);
         registry.addGhostIngredientHandler(modularUIGuiHandler.getGuiContainerClass(), modularUIGuiHandler);

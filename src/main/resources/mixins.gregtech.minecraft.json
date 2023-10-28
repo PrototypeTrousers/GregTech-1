@@ -12,7 +12,6 @@
   "client": [
     "LayerArmorBaseMixin",
     "LayerCustomHeadMixin",
-    "RenderChunkMixin",
     "RenderGlobalMixin"
   ],
   "server": []
