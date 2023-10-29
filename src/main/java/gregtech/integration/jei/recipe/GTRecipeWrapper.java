@@ -19,12 +19,15 @@ import gregtech.api.recipes.machines.IResearchRecipeMap;
 import gregtech.api.recipes.machines.IScannerRecipeMap;
 import gregtech.api.recipes.recipeproperties.ComputationProperty;
 import gregtech.api.recipes.recipeproperties.RecipeProperty;
+import gregtech.api.recipes.recipeproperties.TemperatureProperty;
 import gregtech.api.recipes.recipeproperties.TotalComputationProperty;
+import gregtech.api.unification.material.properties.BlastProperty;
 import gregtech.api.util.AssemblyLineManager;
 import gregtech.api.util.ClipboardUtil;
 import gregtech.api.util.GTUtility;
 import gregtech.api.util.TextFormattingUtil;
 import gregtech.client.utils.TooltipHelper;
+import gregtech.common.metatileentities.multi.electric.MetaTileEntityElectricBlastFurnace;
 import gregtech.integration.RecipeCompatUtil;
 import gregtech.integration.jei.utils.AdvancedRecipeWrapper;
 import gregtech.integration.jei.utils.JeiButton;
@@ -197,6 +200,8 @@ public class GTRecipeWrapper extends AdvancedRecipeWrapper {
         int yPosition = recipeHeight - ((recipe.getUnhiddenPropertyCount() + defaultLines) * 10 - 3);
 
         int[] oc = null;
+        int temperature = 0;
+        long voltage =0;
         if (minecraft.player.openContainer instanceof ModularUIContainer modularUIContainer) {
             if (modularUIContainer.getModularUI().holder instanceof MetaTileEntityHolder holder) {
                 MetaTileEntity mte = holder.getMetaTileEntity();
@@ -204,13 +209,25 @@ public class GTRecipeWrapper extends AdvancedRecipeWrapper {
                     RecipeMap<?> rm = holder.getMetaTileEntity().getRecipeMap();
                     if (rm != null) {
                         if (recipe.getRecipeCategory().getRecipeMap() == rm) {
-                            if (!(mte instanceof RecipeMapMultiblockController multiblockController) || multiblockController.isStructureFormed()) {
+                            if (mte instanceof RecipeMapMultiblockController multiblockController) {
+                                if (multiblockController.isStructureFormed()) {
+                                    oc = mte.getRecipeLogic().performOverclocking(recipe);
+                                    if (multiblockController instanceof MetaTileEntityElectricBlastFurnace metaTileEntityElectricBlastFurnace) {
+                                        temperature = metaTileEntityElectricBlastFurnace.getCurrentTemperature();
+                                    }
+                                }
+                            } else {
                                 oc = mte.getRecipeLogic().performOverclocking(recipe);
+                                voltage = mte.getRecipeLogic().getMaximumOverclockVoltage();
                             }
                         }
                     }
                 }
             }
+        }
+
+        if (oc != null && oc[0] == recipe.getEUt() && oc[1] == recipe.getDuration()) {
+            oc = null;
         }
 
         // Default entries
@@ -221,15 +238,19 @@ public class GTRecipeWrapper extends AdvancedRecipeWrapper {
                 int minimumCWUt = recipe.getProperty(ComputationProperty.getInstance(), 1);
                 minecraft.fontRenderer.drawString(I18n.format("gregtech.recipe.max_eu", eu / minimumCWUt), 0, yPosition, 0x111111);
             } else {
-                minecraft.fontRenderer.drawString(I18n.format("gregtech.recipe.total", eu), 0, yPosition, 0x111111);
+                if (oc == null) {
+                    minecraft.fontRenderer.drawString(I18n.format("gregtech.recipe.total", eu), 0, yPosition, 0x111111);
+                } else {
+                    minecraft.fontRenderer.drawString(I18n.format("gregtech.recipe.overclockedtotal", eu, (long) oc[0] * oc[1]), 0, yPosition, 0x111111);
+                }
             }
         }
 
         if (drawEUt) {
-            if (oc != null && recipe.getEUt() >0 ) {
-                minecraft.fontRenderer.drawString(I18n.format("gregtech.overclockedrecipe.eu" , Math.abs(recipe.getEUt()), Math.abs(oc[0]), GTValues.VN[GTUtility.getTierByVoltage(recipe.getEUt())], GTValues.VN[GTUtility.getTierByVoltage(oc[0])]), 0, yPosition += LINE_HEIGHT, 0x111111);
-            }else {
-                minecraft.fontRenderer.drawString(I18n.format(recipe.getEUt() >= 0 ? "gregtech.recipe.eu" : "gregtech.recipe.eu_inverted", Math.abs(recipe.getEUt()), GTValues.VN[GTUtility.getTierByVoltage(recipe.getEUt())]), 0, yPosition += LINE_HEIGHT, 0x111111);
+            if (oc != null && recipe.getEUt() > 0) {
+                minecraft.fontRenderer.drawString(I18n.format("gregtech.overclockedrecipe.eu", Math.abs(recipe.getEUt()), Math.abs(oc[0]), GTValues.VN[GTUtility.getTierByVoltage(recipe.getEUt())], GTValues.VN[GTUtility.getTierByVoltage(oc[0])]), 0, yPosition += LINE_HEIGHT, 0x111111);
+            } else {
+                minecraft.fontRenderer.drawString((voltage> 0 && voltage < recipe.getEUt() ? "§4" : "") + I18n.format(recipe.getEUt() >= 0 ? "gregtech.recipe.eu" : "gregtech.recipe.eu_inverted" + "§r", Math.abs(recipe.getEUt()), GTValues.VN[GTUtility.getTierByVoltage(recipe.getEUt())]), 0, yPosition += LINE_HEIGHT, 0x111111);
             }
         }
         if (drawDuration) {
@@ -245,7 +266,11 @@ public class GTRecipeWrapper extends AdvancedRecipeWrapper {
             if (!propertyEntry.getKey().isHidden()) {
                 RecipeProperty<?> property = propertyEntry.getKey();
                 Object value = propertyEntry.getValue();
-                property.drawInfo(minecraft, 0, yPosition += property.getInfoHeight(value), 0x111111, value, mouseX, mouseY);
+                if (property instanceof TemperatureProperty) {
+                    property.drawInfo(minecraft, 0, yPosition += property.getInfoHeight(temperature), 0x111111, temperature, mouseX, mouseY);
+                } else {
+                    property.drawInfo(minecraft, 0, yPosition += property.getInfoHeight(value), 0x111111, value, mouseX, mouseY);
+                }
             }
         }
     }

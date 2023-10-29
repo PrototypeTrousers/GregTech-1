@@ -5161,12 +5161,14 @@ gregtech.universal.tooltip.requires_redstone=§4Requires Redstone power
 gregtech.block.tooltip.no_mob_spawning=§bMobs cannot spawn on this block
 
 gregtech.recipe.total=Total: %,d EU
+gregtech.recipe.overclockedtotal=Total: %,d -> %,d EU
 gregtech.recipe.max_eu=Max. EU: %,d EU
-gregtech.recipe.eu=Usage: %,d EU/t (%s§r)
+gregtech.recipe.overclockedmax_eu=Max. EU: %,d -> %,d EU
+gregtech.recipe.eu=Usage: %,d EU/t (%s)
 gregtech.recipe.eu_inverted=Generation: %,d EU/t
-gregtech.overclockedrecipe.eu=Usage: §m%,d§r %,d EU/t §m(%s)§r (%s)
+gregtech.overclockedrecipe.eu=Usage: %,d -> %,d EU/t (%s) -> (%s)
 gregtech.recipe.duration=Duration: %s secs
-gregtech.recipe.overclockedduration=Duration: §m%s§r %s secs
+gregtech.recipe.overclockedduration=Duration: %s -> %s secs
 gregtech.recipe.amperage=Amperage: %,d
 gregtech.recipe.not_consumed=Does not get consumed in the process
 gregtech.recipe.chance=Chance: %s%% +%s%%/tier
